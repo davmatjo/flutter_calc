@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Calculator extends StatefulWidget {
   Calculator({Key key}) : super(key: key);
@@ -20,6 +21,10 @@ class CalculatorState extends State<Calculator> {
   static final double keypadScaleFactor = 6.0;
   static final double operationScaleFactor = 5.0;
   static final FontWeight keypadWeight = FontWeight.w200;
+
+  Color operationColor(operation op) {
+    return op == currentOp ? new Color(0xFF004ba0) : new Color(0x00000000);
+  }
 
   bool isDisplayInt() {
     return displayValue.floor() == displayValue;
@@ -60,9 +65,14 @@ class CalculatorState extends State<Calculator> {
         int displayValueInt = displayValue.floor();
         String displayValueString = displayValueInt.toString();
         int numlength = displayValueString.length;
-        displayValue = double.parse(numlength > 1
-            ? displayValueString.substring(0, numlength - 1)
-            : '0');
+
+        if (displayValueInt < 0 && numlength <= 2) {
+          displayValue = 0.0;
+        } else {
+          displayValue = double.parse(numlength > 1
+              ? displayValueString.substring(0, numlength - 1)
+              : '0');
+        }
       } else {
         int length = displayValue.toString().length;
         String displayValueString = displayValue.toString();
@@ -73,46 +83,50 @@ class CalculatorState extends State<Calculator> {
   }
 
   void _handleOperation(operation op) {
-    currentOp = op;
-    storedValue = displayValue;
+    setState(() {
+      currentOp = op;
+      storedValue = displayValue;
+    });
   }
 
   void _handleEquals() {
-    if (enteringSecond) {
-      setState(() {
-        switch (currentOp) {
-          case operation.ADD:
-            {
-              displayValue = storedValue + displayValue;
-              break;
-            }
-          case operation.SUB:
-            {
-              displayValue = storedValue - displayValue;
-              break;
-            }
-          case operation.MUL:
-            {
-              displayValue = storedValue * displayValue;
-              break;
-            }
-          case operation.DIV:
-            {
-              if (displayValue != 0.0) {
-                displayValue = storedValue / displayValue;
-              }
-              break;
-            }
-          case operation.NIL:
-            {
-              break;
-            }
-        }
-      });
-    }
+    setState(() {
+      if (enteringSecond) {
 
-    currentOp = operation.NIL;
-    enteringSecond = false;
+          switch (currentOp) {
+            case operation.ADD:
+              {
+                displayValue = storedValue + displayValue;
+                break;
+              }
+            case operation.SUB:
+              {
+                displayValue = storedValue - displayValue;
+                break;
+              }
+            case operation.MUL:
+              {
+                displayValue = storedValue * displayValue;
+                break;
+              }
+            case operation.DIV:
+              {
+                if (displayValue != 0.0) {
+                  displayValue = storedValue / displayValue;
+                }
+                break;
+              }
+            case operation.NIL:
+              {
+                break;
+              }
+          }
+
+      }
+
+      currentOp = operation.NIL;
+      enteringSecond = false;
+    });
   }
 
   @override
@@ -121,7 +135,6 @@ class CalculatorState extends State<Calculator> {
       // Center is a layout widget. It takes a single child and positions it
       // in the middle of the parent.
       child: new Container(
-        color: new Color(0xFF212121),
         child: new Column(
           // Column is also layout widget. It takes a list of children and
           // arranges them vertically. By default, it sizes itself to fit its
@@ -290,28 +303,36 @@ class CalculatorState extends State<Calculator> {
                               '-',
                               textScaleFactor: operationScaleFactor,
                               style: new TextStyle(color: Colors.white),
-                            )),
+                            ),
+                          color: operationColor(operation.SUB),
+                        ),
                         new FlatButton(
                             onPressed: () => _handleOperation(operation.ADD),
                             child: new Text(
                               '+',
                               textScaleFactor: operationScaleFactor,
                               style: new TextStyle(color: Colors.white),
-                            )),
+                            ),
+                          color: operationColor(operation.ADD),
+                        ),
                         new FlatButton(
                             onPressed: () => _handleOperation(operation.MUL),
                             child: new Text(
                               '×',
                               textScaleFactor: operationScaleFactor,
                               style: new TextStyle(color: Colors.white),
-                            )),
+                            ),
+                          color: operationColor(operation.MUL),
+                        ),
                         new FlatButton(
                             onPressed: () => _handleOperation(operation.DIV),
                             child: new Text(
                               '÷',
                               textScaleFactor: operationScaleFactor,
                               style: new TextStyle(color: Colors.white),
-                            )),
+                            ),
+                          color: operationColor(operation.DIV),
+                        ),
                         new FlatButton(
                             onPressed: _handleEquals,
                             child: new Text(

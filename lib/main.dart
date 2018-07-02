@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'second.dart';
+import 'quadratic.dart';
 import 'calculator.dart';
 
 void main() => runApp(new MyApp());
@@ -13,6 +13,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
     return new MaterialApp(
       title: 'Calculator Mk2',
       theme: new ThemeData(
@@ -49,7 +51,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-enum fragments { CALC, SND }
+enum fragments { CALC, QUADF }
 
 class _MyHomePageState extends State<MyHomePage> {
   static final fragments homeFragment = fragments.CALC;
@@ -62,9 +64,9 @@ class _MyHomePageState extends State<MyHomePage> {
         {
           return new Calculator();
         }
-      case fragments.SND:
+      case fragments.QUADF:
         {
-          return new SecondScreen();
+          return new QuadraticFormula();
         }
     }
   }
@@ -94,6 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
+      backgroundColor: new Color(0xFF212121),
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -105,7 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: new ListView(
           children: <Widget>[
             new DrawerHeader(
-              child: new Text('a'),
+              child: new Image(
+                image: new AssetImage('assets/osc.png')
+              )
             ),
             new ListTile(
               leading: new Icon(Icons.home),
@@ -116,11 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             new ListTile(
-              leading: new Icon(Icons.account_balance),
-              title: new Text('Something'),
+              leading: new Icon(Icons.keyboard_arrow_right),
+              title: new Text('Quadratic Formula'),
               onTap: () {
                 Navigator.pop(context);
-                newFragment(fragments.SND);
+                newFragment(fragments.QUADF);
               },
             ),
           ],
